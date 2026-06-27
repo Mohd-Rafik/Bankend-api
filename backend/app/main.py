@@ -1,13 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.schema import OnboardingRecord
-from app.service import (
-    get_onboarding_records,
-    add_onboarding_record,
-    delete_onboarding_record,
-    update_onboarding_record,
-)
+from app.routers.onboarding import router as onboarding_router
 
 app = FastAPI()
 
@@ -22,37 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(onboarding_router)
+
 
 @app.get("/")
 def home():
-    return {"message": "API Running"}
-
-
-@app.get("/onboarding/list")
-def onboarding_list():
-    return get_onboarding_records()
-
-
-@app.post("/onboarding/submit")
-def onboarding_submit(record: OnboardingRecord):
-    return add_onboarding_record(record)
-
-
-@app.delete("/onboarding/{id}")
-def delete(id: str):
-
-    if not delete_onboarding_record(id):
-        raise HTTPException(404, "Record not found")
-
-    return {"message": "Deleted Successfully"}
-
-
-@app.put("/onboarding/{id}")
-def update(id: str, record: OnboardingRecord):
-
-    data = update_onboarding_record(id, record)
-
-    if not data:
-        raise HTTPException(404, "Record not found")
-
-    return data
+    return {"status": "success", "message": "API Running", "data": None}
